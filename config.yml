@@ -1,0 +1,6 @@
+
+messageColor: '&b'
+chatFormat: '&a[P] &f{DISPLAYNAME}&f: {MESSAGE}'
+invite_sec: 30
+auto-save: 90
+rooms-per-page: 15

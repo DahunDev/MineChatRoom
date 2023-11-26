@@ -1,0 +1,21 @@
+name: MineChatRoom
+main: net.daniel.ChatRoom.ChatRoomPlugin
+version: 1.1
+description: Chatroom Plugin
+commands:
+  g:
+    description: Send a chat message
+    permission: ChatRoom.user
+    usage: "/g <message>"
+  채팅방:
+    permission: ChatRoom.user
+    usage: "사용법 : /채팅방"
+  채팅방관리:
+    permission: ChatRoom.Admin
+    usage: "사용법 : /채팅방관리"
+  chat:
+    permission: ChatRoom.user
+    usage: "사용법 : /채팅방 도움말"
+
+        
+        
