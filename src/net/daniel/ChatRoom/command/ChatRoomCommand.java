@@ -94,7 +94,7 @@ public class ChatRoomCommand implements CommandExecutor, TabCompleter {
 
                         } else if (args.length == 1) {
 
-                            if (sender instanceof Player p) {
+                            if (!(sender instanceof Player)) {
                                 sender.sendMessage(Lang.ONLY_PLAYER.toString());
                                 return;
                             }
@@ -118,7 +118,7 @@ public class ChatRoomCommand implements CommandExecutor, TabCompleter {
 
                         break;
                     case "생성":
-                        if (sender instanceof Player p) {
+                        if (!(sender instanceof Player)) {
                             sender.sendMessage(Lang.ONLY_PLAYER.toString());
                             return;
                         }
