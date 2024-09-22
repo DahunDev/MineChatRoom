@@ -29,7 +29,7 @@ import net.daniel.ChatRoom.data.InviteHolder;
 public class ChatRoomPlugin extends JavaPlugin {
 	public static ChatRoomPlugin plugin;
 
-	// ´ë¼Ò¹®ÀÚ ±¸ºĞ ¹®Á¦ (ÀÌ¸§Àº µÑ´Ù Ç×»ó ¼Ò¹®ÀÚ·Î ÀúÀå)
+	// ëŒ€ì†Œë¬¸ì êµ¬ë¶„ ë¬¸ì œ (ì´ë¦„ì€ ë‘˜ë‹¤ í•­ìƒ ì†Œë¬¸ìë¡œ ì €ì¥)
 	public static HashMap<String, ChatRoom> existRooms;
 
 	// player,ChatRoom
@@ -40,7 +40,7 @@ public class ChatRoomPlugin extends JavaPlugin {
 	public static ArrayList<String> chatroomModenames;
 	public static ArrayList<Player> spyPlayers;
 
-	// ´ë¼Ò¹®ÀÚ ±¸ºĞ ¹®Á¦ÇØ°áÀº ÃßÈÄ UUIDÁö¿øÀ¸·Î º¯°æ /
+	// ëŒ€ì†Œë¬¸ì êµ¬ë¶„ ë¬¸ì œí•´ê²°ì€ ì¶”í›„ UUIDì§€ì›ìœ¼ë¡œ ë³€ê²½ /
 
 	public static DataYML ChatRoomYML;
 
@@ -72,14 +72,14 @@ public class ChatRoomPlugin extends JavaPlugin {
 		loadChatRoomData();
 
 		getCommand("g").setExecutor(new SendchatCommand());
-		getCommand("Ã¤ÆÃ¹æ").setExecutor(new ChatRoomCommand());
+		getCommand("ì±„íŒ…ë°©").setExecutor(new ChatRoomCommand());
 		getCommand("chat").setExecutor(new ChatCommand());
-		getCommand("Ã¤ÆÃ¹æ°ü¸®").setExecutor(new ManageCommand());
-	
-		
+		getCommand("ì±„íŒ…ë°©ê´€ë¦¬").setExecutor(new ManageCommand());
+
+
 
 		getServer().getPluginManager().registerEvents(new PlayerEventHandler(), this);
-		
+
 	}
 
 	public void onDisable() {
@@ -157,10 +157,10 @@ public class ChatRoomPlugin extends JavaPlugin {
 
 		chatFormat = getConfig().getString("chatFormat", "&a[PartyN] &f{DISPLAYNAME}&f: {MESSAGE}");
 		if (!chatFormat.contains("") || !chatFormat.contains("DISPLAYNAME")) {
-			System.out.println("chatFormat¿¡ {DISPLAYNAME} ¶Ç´Â {MESSAGE}°¡ ´©¶ôµÇ¾î ÀÖ¾î ±âº»°ªÀ¸·Î ¼³Á¤µÊ");
+			System.out.println("chatFormatì— {DISPLAYNAME} ë˜ëŠ” {MESSAGE}ê°€ ëˆ„ë½ë˜ì–´ ìˆì–´ ê¸°ë³¸ê°’ìœ¼ë¡œ ì„¤ì •ë¨");
 			chatFormat = "&a[P] &f{DISPLAYNAME}&f: {MESSAGE}";
 		}
-		
+
 		chatFormat = ChatColor.translateAlternateColorCodes('&', chatFormat);
 
 		config_messageColor = ChatColor.getByChar(getConfig().getString("messageColor").substring(1));
@@ -170,30 +170,30 @@ public class ChatRoomPlugin extends JavaPlugin {
 		room_per_page = getConfig().getInt("rooms-per-page", 15);
 
 		if (room_per_page < 1) {
-			System.out.println("rooms-per-page °ªÀº 0º¸´Ù Å« Á¤¼ö¿©¾ß ÇÕ´Ï´Ù.");
+			System.out.println("rooms-per-page ê°’ì€ 0ë³´ë‹¤ í° ì •ìˆ˜ì—¬ì•¼ í•©ë‹ˆë‹¤.");
 			room_per_page = 15;
 		}
 
 		invite_Sec = getConfig().getInt("invite_sec", 30);
 
 		if (invite_Sec < 1) {
-			System.out.println("invite_sec °ªÀº 0º¸´Ù Å« Á¤¼ö¿©¾ß ÇÕ´Ï´Ù.");
+			System.out.println("invite_sec ê°’ì€ 0ë³´ë‹¤ í° ì •ìˆ˜ì—¬ì•¼ í•©ë‹ˆë‹¤.");
 			invite_Sec = 30;
 		}
 
 		autoSave = getConfig().getDouble("auto-save", 90.0);
 
 		if (autoSave < 1) {
-			System.out.println("auto-save °ªÀº 1ÀÌ»óÀÇ ¼ıÀÚ¿©¾ß ÇÕ´Ï´Ù. (´ÜÀ§ ÃÊ)");
+			System.out.println("auto-save ê°’ì€ 1ì´ìƒì˜ ìˆ«ìì—¬ì•¼ í•©ë‹ˆë‹¤. (ë‹¨ìœ„ ì´ˆ)");
 			autoSave = 90.0;
 		}
 
 		loadLangConfiguration();
 		Lang.init(langConfig);
 		saveLangConfigurations();
-		
+
 		//AutoSaver.register(this);
-		Bukkit.getScheduler().cancelTasks(this);		
+		Bukkit.getScheduler().cancelTasks(this);
 	}
 
 	public void saveLangConfigurations() {
@@ -338,7 +338,7 @@ public class ChatRoomPlugin extends JavaPlugin {
 		}
 		getLogger().info("[" + room.getName() + "] " + message);
 	}
-	
+
 	public boolean isSameRoom(String room, Player player) {
 
 		ChatRoom chatroom = MCUtils.getChatRoom(player);
@@ -349,10 +349,10 @@ public class ChatRoomPlugin extends JavaPlugin {
 		}
 
 	}
-	
+
 	public boolean isSameRoom(ChatRoom room, Player player) {
 		return isSameRoom(room.getName(), player);
-			
+
 	}
 
 

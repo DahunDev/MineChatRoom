@@ -11,35 +11,34 @@ import net.daniel.ChatRoom.Utils.MCUtils;
 
 public class ChatCommand implements CommandExecutor {
 
-	// chat
+    // chat
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		if (MCUtils.mustBePlayer(sender)) {
+        if (!MCUtils.mustBePlayer(sender)) {
+            return true;
+        }
 
-			Player player = (Player) sender;
+        Player player = (Player) sender;
 
-			if (sender.hasPermission("ChatRoom.user")) {
+        if (sender.hasPermission("ChatRoom.user")) {
 
-				String uuid = player.getUniqueId().toString();
-				if (ChatRoomPlugin.chatroomModenames.contains(uuid)) {
-					ChatRoomPlugin.chatroomModenames.remove(uuid);
+            String uuid = player.getUniqueId().toString();
+            if (ChatRoomPlugin.chatroomModenames.contains(uuid)) {
+                ChatRoomPlugin.chatroomModenames.remove(uuid);
 
-					sender.sendMessage(Lang.GLOBAL_CHAT_TOGGLED.toString());
-				} else {
-					ChatRoomPlugin.chatroomModenames.add(uuid);
-					sender.sendMessage(Lang.CHATROOM_TOGGLED.toString());
-				}
+                sender.sendMessage(Lang.GLOBAL_CHAT_TOGGLED.toString());
+            } else {
+                ChatRoomPlugin.chatroomModenames.add(uuid);
+                sender.sendMessage(Lang.CHATROOM_TOGGLED.toString());
+            }
 
-			} else {
-				sender.sendMessage(Lang.NO_PERM.toString());
-			}
+        } else {
+            sender.sendMessage(Lang.NO_PERM.toString());
+        }
 
-		}
-		
-		
 
-		return true;
-	}
+        return true;
+    }
 }

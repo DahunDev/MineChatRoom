@@ -21,464 +21,453 @@ import net.daniel.ChatRoom.Utils.MCUtils;
 
 public class ChatRoomCommand implements CommandExecutor, TabCompleter {
 
-	ChatRoomPlugin plugin = ChatRoomPlugin.plugin;
+    ChatRoomPlugin plugin = ChatRoomPlugin.plugin;
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        List<String> list = new ArrayList<>();
+
+        if (args.length < 2) {
+
+            list.add("Ï†ïÎ≥¥");
+            list.add("ÏÉùÏÑ±");
+            list.add("Î™©Î°ù");
+            list.add("ÏàòÎùΩ");
+            list.add("Í±∞Ï†à");
+            list.add("Ï¥àÎåÄ");
+            list.add("ÏßÄÎèÑÏûê");
+            list.add("Ï°∞Ìöå");
+            list.add("ÎÇòÍ∞ÄÍ∏∞");
+            list.add("Ï∂îÎ∞©");
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-		List<String> list = new ArrayList<>();
+            String finalArg = args[args.length - 1];
+            Iterator<String> it = list.iterator();
+            while (it.hasNext()) {
+                if (!it.next().startsWith(finalArg)) {
+                    it.remove();
+                }
+            }
 
-		if (args.length < 2) {
+            return list;
+        } else {
+            return null; // Default completion
 
-			list.add("¡§∫∏");
-			list.add("ª˝º∫");
-			list.add("∏Ò∑œ");
-			list.add("ºˆ∂Ù");
-			list.add("∞≈¿˝");
-			list.add("√ ¥Î");
-			list.add("¡ˆµµ¿⁄");
-			list.add("¡∂»∏");
-			list.add("≥™∞°±‚");
-			list.add("√ﬂπÊ");
+        }
 
-			String finalArg = args[args.length - 1];
-			Iterator<String> it = list.iterator();
-			while (it.hasNext()) {
-				if (!it.next().startsWith(finalArg)) {
-					it.remove();
-				}
-			}
+    }
 
-			return list;
-		} else {
-			return null; // Default completion
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		}
+        if (!sender.hasPermission("ChatRoom.user")) {
+            sender.sendMessage(Lang.NO_PERM.toString());
+            return true;
+        }
 
-	}
+        if (args.length < 1) {
+            sender.sendMessage(Lang.CHATROOM_CMD_HELP.toString());
+            return true;
+        }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		if (sender.hasPermission("ChatRoom.user")) {
+        new BukkitRunnable() {
 
-			if (args.length >= 1) {
+            @Override
+            public void run() {
+                switch (args[0]) {
+                    case "Ï†ïÎ≥¥":
+                        if (args.length == 2) {
 
-				new BukkitRunnable() {
+                            ChatRoom room = ChatRoomPlugin.existRooms.get(args[1].toLowerCase());
 
-					@Override
-					public void run() {
-						switch (args[0]) {
-						case "¡§∫∏":
-							if (args.length == 2) {
+                            if (room == null) {
+                                sender.sendMessage(
+                                        Lang.CHATROOM_NOTEXIST.toString().replaceAll("%chatroom%", args[1]));
+                                return;
+                            }
 
-								ChatRoom room = ChatRoomPlugin.existRooms.get(args[1].toLowerCase());
+                            sender.sendMessage(Lang.withPlaceHolder(Lang.CHATROOM_INFO,
+                                    new String[]{"%chatroom%", "%leaders%", "%members%", "%size%"},
+                                    room.getName(), room.getLeaderList(), room.getMemberList(),
+                                    room.getTeamSize()));
 
-								if (room == null) {
-									sender.sendMessage(
-											Lang.CHATROOM_NOTEXIST.toString().replaceAll("%chatroom%", args[1]));
-								} else {
 
-									sender.sendMessage(Lang.withPlaceHolder(Lang.CHATROOM_INFO,
-											new String[] { "%chatroom%", "%leaders%", "%members%", "%size%" },
-											room.getName(), room.getLeaderList(), room.getMemberList(),
-											room.getTeamSize()));
+                        } else if (args.length == 1) {
 
-								}
+                            if (sender instanceof Player p) {
+                                sender.sendMessage(Lang.ONLY_PLAYER.toString());
+                                return;
+                            }
 
-							} else if (args.length == 1) {
+                            ChatRoom room = MCUtils.getChatRoom(p);
 
-								if (sender instanceof Player) {
+                            if (room == null) {
+                                sender.sendMessage(Lang.PLAYER_HAS_NO_CHATROOM.toString());
+                                return;
+                            }
+                            sender.sendMessage(Lang.withPlaceHolder(Lang.CHATROOM_INFO_MINE,
+                                    new String[]{"%chatroom%", "%leaders%", "%members%", "%size%"},
+                                    room.getName(), room.getLeaderList(), room.getMemberList(),
+                                    room.getTeamSize()));
 
-									Player p = (Player) sender;
+                        } else {
 
-									ChatRoom room = MCUtils.getChatRoom(p);
+                            sender.sendMessage(Lang.CHATROOM_INFO_HELP.toString());
 
-									if (room != null) {
-										sender.sendMessage(Lang.withPlaceHolder(Lang.CHATROOM_INFO_MINE,
-												new String[] { "%chatroom%", "%leaders%", "%members%", "%size%" },
-												room.getName(), room.getLeaderList(), room.getMemberList(),
-												room.getTeamSize()));
-									} else {
-										sender.sendMessage(Lang.PLAYER_HAS_NO_CHATROOM.toString());
+                        }
 
-									}
+                        break;
+                    case "ÏÉùÏÑ±":
+                        if (sender instanceof Player p) {
+                            sender.sendMessage(Lang.ONLY_PLAYER.toString());
+                            return;
+                        }
 
-								} else {
-									sender.sendMessage(Lang.ONLY_PLAYER.toString());
+                        if (args.length == 2) {
+                            if (ChatRoomPlugin.existRooms.get(args[1].toLowerCase()) != null) {
+                                sender.sendMessage(Lang.CHATROOM_ALREADY_EXIST.toString()
+                                        .replaceAll("%chatroom%", Matcher.quoteReplacement(args[1])));
+                                return;
+                            }
 
-								}
 
-							} else {
+                            if (MCUtils.getChatRoom(p) != null) {
+                                sender.sendMessage(Lang.ALREADY_HAS_CHATROOM_ME.toString());
+                                return;
+                            }
 
-								sender.sendMessage(Lang.CHATROOM_INFO_HELP.toString());
+                            String name = ChatColor.translateAlternateColorCodes('&', args[1]);
 
-							}
+                            int size = ChatColor.stripColor(name).length();
 
-							break;
-						case "ª˝º∫":
-							if (sender instanceof Player) {
+                            if (size != args[1].length()) {
+                                sender.sendMessage(Lang.CONTAINS_NOALLOWED_CHAR.toString());
+                                return;
 
-								Player p = (Player) sender;
+                            }
 
-								if (args.length == 2) {
-									if (ChatRoomPlugin.existRooms.get(args[1].toLowerCase()) == null) {
 
-										if (MCUtils.getChatRoom(p) == null) {
+                            if (!((args[1].contains(".") || args[1].contains(",")
+                                    || args[1].contains("#") || args[1].contains("$")))) {
+                                ChatRoomPlugin.createChatRoom(args[1], p);
 
-											String name = ChatColor.translateAlternateColorCodes('&', args[1]);
-										
-											int size = ChatColor.stripColor(name).length();
+                                sender.sendMessage(Lang.CREATED_CHATROOM.toString()
+                                        .replaceAll("%chatroom%", args[1].toLowerCase()));
 
-											if (size == args[1].length()) {
+                            } else {
+                                sender.sendMessage(Lang.CONTAINS_NOALLOWED_CHAR.toString());
+                            }
 
-												if (!((args[1].contains(".") || args[1].contains(",")
-														|| args[1].contains("#") || args[1].contains("$")))) {
-													ChatRoomPlugin.createChatRoom(args[1], p);
+                        } else if (args.length > 2) {
+                            sender.sendMessage(Lang.NO_CHATROOM_NAME_SPACE.toString());
 
-													sender.sendMessage(Lang.CREATED_CHATROOM.toString()
-															.replaceAll("%chatroom%", args[1].toLowerCase()));
+                        } else {
 
-												} else {
-													sender.sendMessage(Lang.CONTAINS_NOALLOWED_CHAR.toString());
-												}
+                            sender.sendMessage(Lang.CHATROOM_CREATE_HELP.toString());
+                        }
 
-											} else {
-												sender.sendMessage(Lang.CONTAINS_NOALLOWED_CHAR.toString());
+                        break;
+                    case "Î™©Î°ù":
+                        if (args.length == 1) {
 
-											}
+                            ArrayList<ChatRoom> rooms = new ArrayList<ChatRoom>(ChatRoomPlugin.existRooms.values());
 
-										} else {
-											sender.sendMessage(Lang.ALREADY_HAS_CHATROOM_ME.toString());
-										}
+                            int start = 0;
+                            int endEx = ChatRoomPlugin.room_per_page;
 
-									} else {
-										sender.sendMessage(Lang.CHATROOM_ALREADY_EXIST.toString()
-												.replaceAll("%chatroom%", Matcher.quoteReplacement(args[1])));
-									}
+                            if (endEx > rooms.size()) {
+                                endEx = rooms.size();
+                            }
 
-								} else if (args.length > 2) {
-									sender.sendMessage(Lang.NO_CHATROOM_NAME_SPACE.toString());
+                            if (start > rooms.size()) {
 
-								} else {
+                                sender.sendMessage(Lang.CHATROOM_LIST.toString().replaceAll("%chatroom_list%",
+                                        Lang.EMPTY_LIST.toString()));
 
-									sender.sendMessage(Lang.CHATROOM_CREATE_HELP.toString());
-								}
+                            } else {
 
-							} else {
-								sender.sendMessage(Lang.ONLY_PLAYER.toString());
-							}
+                                StringBuilder list = new StringBuilder();
 
-							break;
-						case "∏Ò∑œ":
-							if (args.length == 1) {
+                                for (int i = start; i < endEx; i++) {
 
-								ArrayList<ChatRoom> rooms = new ArrayList<ChatRoom>(ChatRoomPlugin.existRooms.values());
+                                    ChatRoom room = rooms.get(i);
 
-								int start = 0;
-								int endEx = ChatRoomPlugin.room_per_page;
+                                    list.append(Lang.withPlaceHolder(Lang.CHATROOM_LIST_LINE,
+                                            new String[]{"%index%", "%chatroom%", "%size%"}, i, room.getName(),
+                                            room.getTeamSize()));
+                                    if (i < endEx - 1) {
+                                        list.append("\n");
+                                    }
 
-								if (endEx > rooms.size()) {
-									endEx = rooms.size();
-								}
+                                }
 
-								if (start > rooms.size()) {
+                                sender.sendMessage(Lang.CHATROOM_LIST.toString().replaceAll("%chatroom_list%",
+                                        list.toString()));
 
-									sender.sendMessage(Lang.CHATROOM_LIST.toString().replaceAll("%chatroom_list%",
-											Lang.EMPTY_LIST.toString()));
+                            }
+                        } else if (args.length == 2) {
+                            if (MCUtils.isInteger(args[1])) {
+                                int page = Integer.parseInt(args[1]);
+                                if (page >= 1) {
 
-								} else {
+                                    ArrayList<ChatRoom> rooms = new ArrayList<ChatRoom>(
+                                            ChatRoomPlugin.existRooms.values());
 
-									StringBuilder list = new StringBuilder();
+                                    int start = ChatRoomPlugin.room_per_page * (page - 1);
+                                    int endEx = ChatRoomPlugin.room_per_page * page;
 
-									for (int i = start; i < endEx; i++) {
+                                    if (endEx > rooms.size()) {
+                                        endEx = rooms.size();
+                                    }
 
-										ChatRoom room = rooms.get(i);
+                                    if (start > rooms.size()) {
 
-										list.append(Lang.withPlaceHolder(Lang.CHATROOM_LIST_LINE,
-												new String[] { "%index%", "%chatroom%", "%size%" }, i, room.getName(),
-												room.getTeamSize()));
-										if (i < endEx - 1) {
-											list.append("\n");
-										}
+                                        sender.sendMessage(Lang.CHATROOM_LIST.toString()
+                                                .replaceAll("%chatroom_list%", Lang.EMPTY_LIST.toString()));
 
-									}
+                                    } else {
 
-									sender.sendMessage(Lang.CHATROOM_LIST.toString().replaceAll("%chatroom_list%",
-											list.toString()));
+                                        StringBuilder list = new StringBuilder();
 
-								}
-							} else if (args.length == 2) {
-								if (MCUtils.isInteger(args[1])) {
-									int page = Integer.parseInt(args[1]);
-									if (page >= 1) {
+                                        for (int i = start; i < endEx; i++) {
 
-										ArrayList<ChatRoom> rooms = new ArrayList<ChatRoom>(
-												ChatRoomPlugin.existRooms.values());
+                                            ChatRoom room = rooms.get(i);
 
-										int start = ChatRoomPlugin.room_per_page * (page - 1);
-										int endEx = ChatRoomPlugin.room_per_page * page;
+                                            list.append(Lang.withPlaceHolder(Lang.CHATROOM_LIST_LINE,
+                                                    new String[]{"%index%", "%chatroom%", "%size%"}, i,
+                                                    room.getName(), room.getTeamSize()));
+                                            if (i < endEx - 1) {
+                                                list.append("\n");
+                                            }
 
-										if (endEx > rooms.size()) {
-											endEx = rooms.size();
-										}
+                                        }
 
-										if (start > rooms.size()) {
+                                        sender.sendMessage(Lang.CHATROOM_LIST.toString()
+                                                .replaceAll("%chatroom_list%", list.toString()));
 
-											sender.sendMessage(Lang.CHATROOM_LIST.toString()
-													.replaceAll("%chatroom_list%", Lang.EMPTY_LIST.toString()));
+                                    }
 
-										} else {
+                                } else {
+                                    sender.sendMessage(Lang.PAGE_CANNOT_UNDER_1.toString());
 
-											StringBuilder list = new StringBuilder();
+                                }
 
-											for (int i = start; i < endEx; i++) {
+                            } else {
+                                sender.sendMessage(Lang.PAGE_SHOULD_NUMBER.toString());
+                            }
 
-												ChatRoom room = rooms.get(i);
+                        } else {
+                            sender.sendMessage(Lang.CHATROOM_LIST_HELP.toString());
 
-												list.append(Lang.withPlaceHolder(Lang.CHATROOM_LIST_LINE,
-														new String[] { "%index%", "%chatroom%", "%size%" }, i,
-														room.getName(), room.getTeamSize()));
-												if (i < endEx - 1) {
-													list.append("\n");
-												}
+                        }
 
-											}
+                        break;
 
-											sender.sendMessage(Lang.CHATROOM_LIST.toString()
-													.replaceAll("%chatroom_list%", list.toString()));
+                    case "ÏàòÎùΩ":
+                        if (MCUtils.mustBePlayer(sender)) {
+                            Player player = (Player) sender;
 
-										}
+                            if (args.length == 1) {
 
-									} else {
-										sender.sendMessage(Lang.PAGE_CANNOT_UNDER_1.toString());
+                                MCUtils.acceptInvite(player);
 
-									}
+                            } else {
+                                sender.sendMessage(Lang.CHATROOM_ACCEPT_HELP.toString());
+                            }
+                        }
 
-								}else {
-									sender.sendMessage(Lang.PAGE_SHOULD_NUMBER.toString());
-								}
+                        break;
 
-							} else {
-								sender.sendMessage(Lang.CHATROOM_LIST_HELP.toString());
+                    case "Í±∞Ï†à":
+                        if (MCUtils.mustBePlayer(sender)) {
+                            Player player = (Player) sender;
 
-							}
+                            if (args.length == 1) {
 
-							break;
+                                MCUtils.denyInvite(player);
 
-						case "ºˆ∂Ù":
-							if (MCUtils.mustBePlayer(sender)) {
-								Player player = (Player) sender;
+                            } else {
+                                sender.sendMessage(Lang.CHATROOM_DENY_HELP.toString());
+                            }
 
-								if (args.length == 1) {
+                        }
 
-									MCUtils.acceptInvite(player);
+                        break;
 
-								} else {
-									sender.sendMessage(Lang.CHATROOM_ACCEPT_HELP.toString());
-								}
-							}
+                    case "Ï¥àÎåÄ":
 
-							break;
+                        if (args.length == 2) {
 
-						case "∞≈¿˝":
-							if (MCUtils.mustBePlayer(sender)) {
-								Player player = (Player) sender;
+                            if (MCUtils.mustBePlayer(sender)) {
 
-								if (args.length == 1) {
+                                Player player = (Player) sender;
 
-									MCUtils.denyInvite(player);
+                                if (MCUtils.mustBeLeader(player)) {
 
-								} else {
-									sender.sendMessage(Lang.CHATROOM_DENY_HELP.toString());
-								}
+                                    if (MCUtils.mustBeOnline(args[1], sender)) {
 
-							}
+                                        MCUtils.inviteAutoExpire(player.getName(), args[1], player);
 
-							break;
+                                    }
 
-						case "√ ¥Î":
+                                }
 
-							if (args.length == 2) {
+                            }
 
-								if (MCUtils.mustBePlayer(sender)) {
+                        } else {
+                            sender.sendMessage(Lang.INVITE_HELP.toString());
 
-									Player player = (Player) sender;
+                        }
 
-									if (MCUtils.mustBeLeader(player)) {
+                        break;
 
-										if (MCUtils.mustBeOnline(args[1], sender)) {
+                    case "ÏßÄÎèÑÏûê":
 
-											MCUtils.inviteAutoExpire(player.getName(), args[1], player);
+                        if (args.length == 2) {
 
-										}
+                            if (MCUtils.mustBePlayer(sender)) {
+                                Player p = (Player) sender;
+                                ChatRoom room = MCUtils.getChatRoom(p);
 
-									}
+                                if (MCUtils.mustBeLeader(p)) {
 
-								}
+                                    if (MCUtils.mustRoomHasThisP(sender, args[1], room)) {
+                                        if (room.isLeader(args[1])) {
+                                            sender.sendMessage(
+                                                    Lang.ALREADY_LEADER.toString().replaceAll("%target%", args[1]));
+                                        } else {
 
-							} else {
-								sender.sendMessage(Lang.INVITE_HELP.toString());
+                                            room.setLeader(args[1]);
 
-							}
+                                            Player target = Bukkit.getPlayerExact(args[1]);
 
-							break;
+                                            sender.sendMessage(Lang.NOW_LEADER_TARGET.toString()
+                                                    .replaceAll("%target%", args[1]));
 
-						case "¡ˆµµ¿⁄":
+                                            if (target != null) {
+                                                sender.sendMessage(Lang.NOW_LEADER_TO_TARGET.toString());
 
-							if (args.length == 2) {
+                                            }
 
-								if (MCUtils.mustBePlayer(sender)) {
-									Player p = (Player) sender;
-									ChatRoom room = MCUtils.getChatRoom(p);
+                                        }
 
-									if (MCUtils.mustBeLeader(p)) {
+                                    }
 
-										if (MCUtils.mustRoomHasThisP(sender, args[1], room)) {
-											if (room.isLeader(args[1])) {
-												sender.sendMessage(
-														Lang.ALREADY_LEADER.toString().replaceAll("%target%", args[1]));
-											} else {
+                                }
 
-												room.setLeader(args[1]);
+                            }
 
-												Player target = Bukkit.getPlayerExact(args[1]);
+                        } else {
+                            sender.sendMessage(Lang.CHATROOM_SETLEADER_HELP.toString());
+                        }
 
-												sender.sendMessage(Lang.NOW_LEADER_TARGET.toString()
-														.replaceAll("%target%", args[1]));
+                        break;
 
-												if (target != null) {
-													sender.sendMessage(Lang.NOW_LEADER_TO_TARGET.toString());
+                    case "Ï°∞Ìöå":
 
-												}
+                        if (args.length == 2) {
 
-											}
+                            ChatRoom room = MCUtils.getChatRoom(args[1]);
 
-										}
+                            if (room != null) {
 
-									}
+                                String name = room.getName();
 
-								}
+                                sender.sendMessage(Lang.TARGET_LOOKUP_CHATROOM.toString()
+                                        .replaceAll("%target%", args[1]).replaceAll("%chatroom%", name));
 
-							} else {
-								sender.sendMessage(Lang.CHATROOM_SETLEADER_HELP.toString());
-							}
+                            } else {
 
-							break;
+                                sender.sendMessage(
+                                        Lang.TARGET_HAS_NO_CHATROOM.toString().replaceAll("%target%", args[1]));
+                            }
 
-						case "¡∂»∏":
+                        } else {
+                            sender.sendMessage(Lang.LOOKUP_PLAYER_CHATROOM_HELP.toString());
+                        }
 
-							if (args.length == 2) {
+                        break;
 
-								ChatRoom room = MCUtils.getChatRoom(args[1]);
+                    case "ÎÇòÍ∞ÄÍ∏∞":
 
-								if (room != null) {
+                        if (MCUtils.mustBePlayer(sender)) {
+                            Player player = (Player) sender;
 
-									String name = room.getName();
+                            if (MCUtils.mustHaveRoom(player)) {
 
-									sender.sendMessage(Lang.TARGET_LOOKUP_CHATROOM.toString()
-											.replaceAll("%target%", args[1]).replaceAll("%chatroom%", name));
+                                ChatRoom room = MCUtils.getChatRoom(player);
 
-								} else {
+                                room.removeLeader(player.getName());
 
-									sender.sendMessage(
-											Lang.TARGET_HAS_NO_CHATROOM.toString().replaceAll("%target%", args[1]));
-								}
+                                room.removeMember(player.getName());
 
-							} else {
-								sender.sendMessage(Lang.LOOKUP_PLAYER_CHATROOM_HELP.toString());
-							}
+                                sender.sendMessage(
+                                        Lang.LEAVE_ROOM.toString().replaceAll("%chatroom%", room.getName()));
 
-							break;
+                                room.sendBroadMessage(Lang.LEAVE_MEMBER_TO_ROOM.toString().replaceAll("%player%",
+                                        player.getName()));
 
-						case "≥™∞°±‚":
+                                plugin.sendBroadtoSpy(room, Lang.LEAVE_MEMBER_TO_ROOM.toString()
+                                        .replaceAll("%player%", player.getName()));
 
-							if (MCUtils.mustBePlayer(sender)) {
-								Player player = (Player) sender;
+                                if (room.getLeaders().size() < 1) {
 
-								if (MCUtils.mustHaveRoom(player)) {
+                                    plugin.deleteChatRoom(room);
 
-									ChatRoom room = MCUtils.getChatRoom(player);
+                                    MCUtils.broadcast(Lang.LEAVE_MEMBER_DELETE_ROOM.toString()
+                                            .replaceAll("%chatroom%", room.getName()));
 
-									room.removeLeader(player.getName());
+                                }
 
-									room.removeMember(player.getName());
+                            }
 
-									sender.sendMessage(
-											Lang.LEAVE_ROOM.toString().replaceAll("%chatroom%", room.getName()));
+                        }
 
-									room.sendBroadMessage(Lang.LEAVE_MEMBER_TO_ROOM.toString().replaceAll("%player%",
-											player.getName()));
+                        break;
 
-									plugin.sendBroadtoSpy(room, Lang.LEAVE_MEMBER_TO_ROOM.toString()
-											.replaceAll("%player%", player.getName()));
+                    case "Ï∂îÎ∞©":
+                        if (args.length == 2) {
+                            if (MCUtils.mustBePlayer(sender)) {
+                                Player player = (Player) sender;
 
-									if (room.getLeaders().size() < 1) {
+                                if (MCUtils.mustBeLeader(player)) {
+                                    ChatRoom room = MCUtils.getChatRoom(player);
+                                    if (MCUtils.mustRoomHasThisP(sender, args[1], room)) {
+                                        if (!room.isLeader(args[1])
+                                                && !player.getName().equalsIgnoreCase(args[1])) {
 
-										plugin.deleteChatRoom(room);
+                                            room.removeMember(args[1]);
 
-										MCUtils.broadcast(Lang.LEAVE_MEMBER_DELETE_ROOM.toString()
-												.replaceAll("%chatroom%", room.getName()));
+                                            String kicked = Lang.KICKED_PLAYER.toString().replaceAll("%target%",
+                                                    args[1]);
+                                            room.sendBroadMessage(kicked);
+                                            MCUtils.sendMsgTo(args[1], Lang.KICKED_FROM_CHATROOM.toString()
+                                                    .replaceAll("%chatroom%", room.getName()));
+                                            plugin.sendSpyPartyMessage(room, kicked);
 
-									}
+                                        } else {
+                                            sender.sendMessage(Lang.CANNOT_KICK_ME_OR_LEADER.toString());
+                                        }
 
-								}
+                                    }
 
-							}
+                                }
 
-							break;
+                            }
+                        } else {
+                            sender.sendMessage(Lang.KICK_HELP.toString());
+                        }
 
-						case "√ﬂπÊ":
-							if (args.length == 2) {
-								if (MCUtils.mustBePlayer(sender)) {
-									Player player = (Player) sender;
+                        break;
 
-									if (MCUtils.mustBeLeader(player)) {
-										ChatRoom room = MCUtils.getChatRoom(player);
-										if (MCUtils.mustRoomHasThisP(sender, args[1], room)) {
-											if (!room.isLeader(args[1])
-													&& !player.getName().equalsIgnoreCase(args[1])) {
+                    default:
+                        sender.sendMessage(Lang.CHATROOM_CMD_HELP.toString());
+                        break;
+                }
+            }
+        }.runTaskAsynchronously(ChatRoomPlugin.plugin);
 
-												room.removeMember(args[1]);
 
-												String kicked = Lang.KICKED_PLAYER.toString().replaceAll("%target%",
-														args[1]);
-												room.sendBroadMessage(kicked);
-												MCUtils.sendMsgTo(args[1], Lang.KICKED_FROM_CHATROOM.toString()
-														.replaceAll("%chatroom%", room.getName()));
-												plugin.sendSpyPartyMessage(room, kicked);
-
-											} else {
-												sender.sendMessage(Lang.CANNOT_KICK_ME_OR_LEADER.toString());
-											}
-
-										}
-
-									}
-
-								}
-							} else {
-								sender.sendMessage(Lang.KICK_HELP.toString());
-							}
-
-							break;
-
-						default:
-							sender.sendMessage(Lang.CHATROOM_CMD_HELP.toString());
-							break;
-						}
-					}
-				}.runTaskAsynchronously(ChatRoomPlugin.plugin);
-
-			} else {
-				sender.sendMessage(Lang.CHATROOM_CMD_HELP.toString());
-				return true;
-			}
-
-		} else {
-			sender.sendMessage(Lang.NO_PERM.toString());
-
-		}
-
-		return true;
-	}
+        return true;
+    }
 }
